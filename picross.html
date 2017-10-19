@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Picross</title>
+	</head>
+	<body>
+		<h1>Picross</h1>
+		<select id="level">
+			<option value=1>Level 1</option>
+		</select>
+		<input type="button" value="Go!" onclick="selectLevel();"/>
+		<hr/>
+		<h1 id="title">???</h1>
+		<table border="1px;" style="text-align:center;" id="gameField"></table>
+		<script>
+			var height;
+			var width;
+			var innerHeight;
+			var innerWidth;
+			var numbersField = [];
+			var picMask = [];
+			var clickMask = [];
+			var size = "small";
+			var goal = 0;
+			var score = 0;
+			var maxLevel = 5;
+			var levelDone = [];
+			for(var i = 0; i < maxLevel; i++)
+			{
+				levelDone[i] = false;
+			}
+			var level = 1;
+			var levelTitle = "";
+
+			function selectLevel()
+			{
+				document.getElementById("title").innerHTML = "???";
+				numbersField = [];
+				picMask = [];
+				clickMask = [];
+				score = 0;
+				level = parseInt(document.getElementById("level").value);
+				switch(level)
+				{
+					case 1:
+						picMask[2] = 1;
+						picMask[6] = 1;
+						picMask[8] = 1;
+						picMask[11] = 1;
+						picMask[12] = 1;
+						picMask[13] = 1;
+						picMask[16] = 1;
+						picMask[18] = 1;
+						picMask[21] = 1;
+						picMask[23] = 1;
+						goal = 10;
+						size = "small";
+						levelTitle = "Letter - A";
+						break;
+					case 2:
+						picMask[0] = 1;
+						picMask[1] = 1;
+						picMask[2] = 1;
+						picMask[5] = 1;
+						picMask[8] = 1;
+						picMask[10] = 1;
+						picMask[11] = 1;
+						picMask[12] = 1;
+						picMask[15] = 1;
+						picMask[18] = 1;
+						picMask[20] = 1;
+						picMask[21] = 1;
+						picMask[22] = 1;
+						goal = 13;
+						size = "small";
+						levelTitle = "Letter - B";
+						break;
+					case 3:
+						picMask[1] = 1;
+						picMask[2] = 1;
+						picMask[5] = 1;
+						picMask[8] = 1;
+						picMask[10] = 1;
+						picMask[15] = 1;
+						picMask[18] = 1;
+						picMask[21] = 1;
+						picMask[22] = 1;
+						goal = 9;
+						size = "small";
+						levelTitle = "Letter - C";
+						break;
+					case 4:
+						picMask[0] = 1;
+						picMask[1] = 1;
+						picMask[2] = 1;
+						picMask[5] = 1;
+						picMask[8] = 1;
+						picMask[10] = 1;
+						picMask[13] = 1;
+						picMask[15] = 1;
+						picMask[18] = 1;
+						picMask[20] = 1;
+						picMask[21] = 1;
+						picMask[22] = 1;
+						goal = 12;
+						size = "small";
+						levelTitle = "Letter - D";
+						break;
+					case 5:
+						picMask[3] = 1;
+						picMask[10] = 1;
+						picMask[11] = 1;
+						picMask[12] = 1;
+						picMask[13] = 1;
+						picMask[14] = 1;
+						picMask[15] = 1;
+						picMask[16] = 1;
+						picMask[17] = 1;
+						picMask[23] = 1;
+						picMask[32] = 1;
+						picMask[33] = 1;
+						picMask[34] = 1;
+						picMask[41] = 1;
+						picMask[43] = 1;
+						picMask[44] = 1;
+						picMask[49] = 1;
+						picMask[50] = 1;
+						picMask[51] = 1;
+						picMask[52] = 1;
+						picMask[53] = 1;
+						picMask[54] = 1;
+						picMask[55] = 1;
+						picMask[56] = 1;
+						picMask[59] = 1;
+						picMask[60] = 1;
+						picMask[61] = 1;
+						picMask[62] = 1;
+						picMask[63] = 1;
+						picMask[64] = 1;
+						picMask[65] = 1;
+						picMask[66] = 1;
+						picMask[67] = 1;
+						picMask[68] = 1;
+						picMask[69] = 1;
+						picMask[72] = 1;
+						picMask[77] = 1;
+						picMask[80] = 1;
+						picMask[81] = 1;
+						picMask[82] = 1;
+						picMask[83] = 1;
+						picMask[84] = 1;
+						picMask[85] = 1;
+						picMask[86] = 1;
+						picMask[87] = 1;
+						picMask[88] = 1;
+						picMask[89] = 1;
+						goal = 47;
+						size = "medium";
+						levelTitle = "Helicopter";
+						break;
+					default:
+						alert("Error occured! Level " + level + " does not exist!");
+				}
+				if(size === "small")
+				{
+					height = 8;
+					width = 8;
+					innerHeight = 3;
+					innerWidth = 3;
+				}
+				else if(size === "medium")
+				{
+					height = 15;
+					width = 15;
+					innerHeight = 5;
+					innerWidth = 5;
+				}
+				else if(size === "large")
+				{
+					height = 22;
+					width = 22;
+					innerHeight = 8;
+					innerWidth = 8;
+				}
+				generateNumberField()
+				createField();
+			}
+
+			function generateNumberField()
+			{
+				// horizontal numbers
+				var count = 0;
+				var empty = 0;
+				var k = 0;
+				for(var i = 0; i < (width - innerWidth); i++)
+				{
+					k = 0;
+					empty = 0;
+					
+					for(var j = 0; j < (height - innerHeight); j++)
+					{
+						if(picMask[(i - (height - innerWidth)) + ((height - innerHeight) - j) * (width - innerWidth)])
+						{
+							count++;
+							if((j + 1) >= (height - innerHeight))
+							{
+								numbersField[i + (innerWidth - k - 1) * (width - innerWidth)] = count;
+								count = 0;
+								k++;
+							}
+						}
+						else if(!picMask[(i - (height - innerWidth)) + ((height - innerHeight) - j) * (width - innerWidth)] && count > 0)
+						{
+							numbersField[i + (innerWidth - k - 1) * (width - innerWidth)] = count;
+							count = 0;
+							k++;
+						}
+						else
+						{
+							empty++;
+						}
+					}
+					if(empty >= (height - innerHeight))
+					{
+						numbersField[i + (innerWidth - 1) * (width - innerWidth)] = 0;
+					}
+				}
+				// vertical numbers
+				for(var j = 0; j < (height - innerHeight); j++)
+				{
+					k = 0;
+					empty = 0;
+
+					for(var i = 0; i < (width - innerWidth); i++)
+					{
+						if(picMask[(width - innerWidth) - i - 1 + j * (width - innerWidth)])
+						{
+							count++;
+							if((i + 1) >= (width - innerWidth))
+							{
+								numbersField[(innerHeight * (width - innerWidth) + (j * innerWidth) + (innerWidth - 1) - k)] = count;
+								count = 0;
+								k++;
+							}
+						}
+						else if(!picMask[(width - innerWidth) - i - 1 + j * (width - innerWidth)] && count > 0)
+						{
+							numbersField[(innerHeight * (width - innerWidth) + (j * innerWidth) + (innerWidth - 1) - k)] = count;
+							count = 0;
+							k++;
+						}
+						else
+						{
+							empty++;
+						}
+					}
+					if(empty >= (height - innerHeight))
+					{
+						numbersField[(innerHeight * (width - innerWidth) + (j * innerWidth) + (innerWidth - 1) - k)] = 0;
+					}
+				}
+			}
+
+			function createField()
+			{
+				var gameFieldHTML = "";
+				for(var i = 0; i < height; i++)
+				{
+					gameFieldHTML += "<tr>";
+					for(var j = 0; j < width; j++)
+					{
+						if(i < innerHeight || j < innerWidth)
+						{
+							var value = "";
+							if(i < innerHeight && j >= innerWidth)
+							{
+								if(numbersField[(j - innerWidth) + i * (width - innerWidth)] >= 0)
+								{
+									value = String(numbersField[(j - innerWidth) + i * (width - innerWidth)]);
+								}
+							}
+							else if(i >= innerHeight && j < innerWidth)
+							{
+								if(numbersField[j + i * (width - innerWidth) - (i - innerHeight) * (width - 2 * innerWidth)] >= 0)
+								{
+									value = String(numbersField[j + i * (width - innerWidth) - (i - innerHeight) * (width - 2 * innerWidth)]);
+								}							
+							}
+							gameFieldHTML += "<td style='background-color:#D9D9D9;height:24px;width:24px;'>" + value + "</td>";
+						}
+						else
+						{
+							gameFieldHTML += "<td id='field" + String(j - innerHeight) + String(i - innerWidth) + "' onclick='checkField(" + (j - innerWidth) + ", " + (i - innerHeight) + ");' style='height:24px;width:24px;'></td>";
+						}
+						
+					}
+					gameFieldHTML += "</tr>";
+				}
+				document.getElementById("gameField").innerHTML = gameFieldHTML;
+			}
+
+			function checkField(x, y)
+			{
+				if(picMask[x + y * (width - innerWidth)] === 1)
+				{
+					if(!clickMask[x + y * (width - innerWidth)])
+					{
+						score++;
+						clickMask[x + y * (width - innerWidth)] = 1;
+					}
+					document.getElementById("field" + String(x) + String(y)).style.background = "#343434";
+					document.getElementById("field" + String(x) + String(y)).style.color = "#000000";
+					if(score >= goal)
+					{
+						document.getElementById("title").innerHTML = levelTitle;
+						if(level + 1 <= maxLevel)
+						{
+							alert("You did it!");
+							if(!levelDone[level - 1])
+							{
+								levelDone[level - 1] = true;
+								var newLevel = document.createElement("option");
+								newLevel.text = "Level " + String(level + 1);
+								newLevel.value = level + 1;
+								document.getElementById("level").add(newLevel);
+							}
+						}
+						else
+						{
+							alert("You bet every level!");
+						}
+					}
+				}
+				else
+				{
+					document.getElementById("field" + String(x) + String(y)).style.color = "#FF0000";
+					document.getElementById("field" + String(x) + String(y)).innerHTML = "X";
+				}
+			}
+		</script>
+	</body>
+</html>
